@@ -1,0 +1,49 @@
+{
+  "project": "tga",
+  "request": "Build an MVP of TGA — a GTA 1 clone (top-down open-world crime game inspired by the 1997 Grand Theft Auto).",
+  "phase": "design",
+  "iteration": 1,
+  "trello": {
+    "boardId": "6a0eaedb87bd46279ad5e14f",
+    "boardUrl": "https://trello.com/b/qphJLFkJ",
+    "lists": {
+      "backlog": "6a0eaee2c11a4ef49db1dfa1",
+      "analysis": "6a0eaee23e169b2850acfb81",
+      "design": "6a0eaee316dfb7323b249c2a",
+      "architecture": "6a0eaee3db90080ed9bdaab4",
+      "coding": "6a0eaee3cfbb5ec96f785f6f",
+      "code_review": "6a0eaee4d753b6165e66305c",
+      "qa": "6a0eaee412dc30a4d85aaa2b",
+      "security": "6a0eaee43270bf07ee7425c5",
+      "done": "6a0eaee5898eb911b5a137ca"
+    },
+    "cards": {
+      "epic": "6a0eb009f52a1deb617707ce",
+      "phase_design": "6a0eb00ad1e1c6360dbe2575",
+      "phase_architecture": "6a0eb00aa580ed887b02e57d",
+      "phase_coding": "6a0eb00ad109a42c00a2b0f7",
+      "phase_code_review": "6a0eb00b24037b130465701a",
+      "phase_qa": "6a0eb00c3c54d774055a4775",
+      "phase_security": "6a0eb00cfaf6272db53fff2b",
+      "phase_pm_review": "6a0eb00d4cbbc1031ea653d7",
+      "analysis-1": "6a0eb00dcfdef0d11ed601a5"
+    }
+  },
+  "branch": "main",
+  "github": {
+    "repo": "dalali/tga",
+    "url": "https://github.com/dalali/tga",
+    "main_protected": true
+  },
+  "artifacts": {
+    "prd": "docs/PRD.md",
+    "design": "docs/design.md",
+    "architecture": "docs/architecture.md"
+  },
+  "issues": [],
+  "status": "running",
+  "notes": {
+    "tech_stack_gate": "User requires explicit approval of tech stack BEFORE coding begins. Architecture phase must produce a clear recommendation; PM must stop after architecture for user review.",
+    "analyst_pick": "Phaser 3 + TypeScript + Vite, Tiled for maps, Arcade Physics, vanilla Web Audio. CC0 art. Docker Compose for local v1."
+  }
+}
