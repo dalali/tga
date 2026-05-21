@@ -13,7 +13,7 @@ export class WantedSystem {
     if (this.stars === 0) return false;
     if (copsSeePlayer) { this.cooldownMs = 0; return false; }
     this.cooldownMs += dt;
-    if (this.cooldownMs >= this.DECAY_INTERVAL) {
+    if (this.cooldownMs > this.DECAY_INTERVAL) {
       this.stars = Math.max(0, this.stars - 1);
       this.cooldownMs = 0;
       return true;

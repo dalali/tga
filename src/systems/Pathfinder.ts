@@ -45,7 +45,6 @@ export class Pathfinder {
     });
   }
 
-  /** Must be called from the game's update loop to process async path requests. */
   update(): void {
     if (this.ready) this.easystar.calculate();
   }

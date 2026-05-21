@@ -45,6 +45,7 @@ export class CopSpawner {
 
   removeCop(id: number): void { this.activeCopIds.delete(id); }
   getActiveCount(): number { return this.activeCopIds.size; }
+  reset(): void { this.activeCopIds.clear(); }
 
   private randomSpawnPoint(): { x: number; y: number } {
     const pad = 5 * 16;

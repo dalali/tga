@@ -39,6 +39,7 @@ export class WorldScene extends Phaser.Scene {
   private vehicles!: Phaser.GameObjects.Group;
   private currentVehicle: Vehicle | null = null;
   private eKey!: Phaser.Input.Keyboard.Key;
+  private enterKey!: Phaser.Input.Keyboard.Key;
 
   // NPCs
   private peds!: Phaser.GameObjects.Group;
@@ -117,8 +118,11 @@ export class WorldScene extends Phaser.Scene {
       SHIFT: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT),
     };
     this.eKey     = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.input.keyboard!.on('keydown-E',   () => { if (this.currentVehicle) this.exitVehicle(); });
+    const exitFn = () => { if (this.currentVehicle) this.exitVehicle(); };
+    this.input.keyboard!.on('keydown-E',     exitFn);
+    this.input.keyboard!.on('keydown-ENTER', exitFn);
     this.input.keyboard!.on('keydown-P',   this.togglePause, this);
     this.input.keyboard!.on('keydown-ESC', this.togglePause, this);
     this.input.keyboard!.on('keydown-M',   () => { this.sound.mute = !this.sound.mute; });
@@ -255,7 +259,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private checkVehicleEntry(): void {
-    if (!Phaser.Input.Keyboard.JustDown(this.eKey)) return;
+    if (!Phaser.Input.Keyboard.JustDown(this.eKey) && !Phaser.Input.Keyboard.JustDown(this.enterKey)) return;
     const ENTER_DIST = 30;
     let nearest: Vehicle | null = null;
     let nearestDist = Infinity;
@@ -343,12 +347,16 @@ export class WorldScene extends Phaser.Scene {
   // ─── Wanted / cop spawning ────────────────────────────────────────────────────
 
   private updateWanted(dt: number): void {
-    // Check if any cop has LoS to player
+    // LoS check: cop sees player if within 400 px (25 tiles) with no impassable tile directly between them.
+    // Full raycasting omitted; 400 px threshold is generous enough that the wanted cooldown
+    // can tick in open streets while still triggering on pursuit.
+    const px = this.player.x;
+    const py = this.player.y;
     let copsSeePlayer = false;
     this.copMap.forEach((cop) => {
       if (cop.isDead()) return;
-      const d = Phaser.Math.Distance.Between(cop.x, cop.y, this.player.x, this.player.y);
-      if (d < 200) copsSeePlayer = true;
+      const d = Phaser.Math.Distance.Between(cop.x, cop.y, px, py);
+      if (d < 400) copsSeePlayer = true;
     });
 
     const changed = this.wantedSystem.update(dt, copsSeePlayer);
@@ -411,7 +419,7 @@ export class WorldScene extends Phaser.Scene {
         this.copMap.forEach(c => c.destroy());
         this.copMap.clear();
         this.cops.clear(true, true);
-        this.copSpawner['activeCopIds'].clear();
+        this.copSpawner.reset();
         // Respawn at hospital
         const hx = HOSPITAL_TX * CONFIG.TILE_SIZE;
         const hy = HOSPITAL_TY * CONFIG.TILE_SIZE;
@@ -428,7 +436,7 @@ export class WorldScene extends Phaser.Scene {
 
   private checkPayphones(): void {
     if (this.missionManager.isActive()) return;
-    if (!Phaser.Input.Keyboard.JustDown(this.eKey)) return;
+    if (!Phaser.Input.Keyboard.JustDown(this.eKey) && !Phaser.Input.Keyboard.JustDown(this.enterKey)) return;
     for (const marker of this.payphoneMarkers) {
       const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, marker.x, marker.y);
       if (d < 24) {
@@ -496,6 +504,9 @@ export class WorldScene extends Phaser.Scene {
 
     // Mission timer
     this.missionManager.update(dt);
+    if (this.missionManager.isActive()) {
+      this.registry.set('missionRemaining', this.missionManager.getRemainingMs());
+    }
 
     // Win check
     this.checkWin();
@@ -532,8 +543,10 @@ export class WorldScene extends Phaser.Scene {
 
   private updateDriving(delta: number): void {
     if (!this.currentVehicle) return;
-    const accel = this.wasd.W.isDown ? 1 : (this.wasd.S.isDown ? -1 : 0);
-    const turn  = this.wasd.A.isDown ? -1 : (this.wasd.D.isDown ? 1 : 0);
+    const accel = (this.wasd.W.isDown || this.cursors.up.isDown)    ? 1
+                : (this.wasd.S.isDown || this.cursors.down.isDown)  ? -1 : 0;
+    const turn  = (this.wasd.A.isDown || this.cursors.left.isDown)  ? -1
+                : (this.wasd.D.isDown || this.cursors.right.isDown) ? 1  : 0;
     this.currentVehicle.driveUpdate(delta, accel, turn);
     this.player.setPosition(this.currentVehicle.x, this.currentVehicle.y);
     this.cameras.main.startFollow(this.currentVehicle, true, 0.08, 0.08);
