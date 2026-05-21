@@ -46,6 +46,9 @@ export class BootScene extends Phaser.Scene {
     g.generateTexture('waypoint', 16, 16); g.clear();
 
     g.destroy();
+
+    // Load missions JSON
+    this.load.json('missions', 'assets/missions.json');
   }
 
   create(): void {

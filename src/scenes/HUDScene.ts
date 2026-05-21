@@ -122,12 +122,82 @@ export class HUDScene extends Phaser.Scene {
       this.weaponText.setText(weapon === 'none' ? 'FISTS' : weapon.toUpperCase());
     });
 
-    // Mute key (also handled in WorldScene; harmless to duplicate)
-    this.input.keyboard!.on('keydown-M', () => {
-      this.sound.mute = !this.sound.mute;
+    // --- Mission strip ---
+    const missionBg = this.add.rectangle(W / 2, H - 14, W, 24, 0x00E5CC, 0.85)
+      .setOrigin(0.5, 0.5).setDepth(199).setVisible(false);
+    const missionText = this.add.text(W / 2, H - 14, '', {
+      fontSize: '11px', color: '#001a15', fontFamily: 'monospace',
+    }).setOrigin(0.5, 0.5).setDepth(202).setVisible(false);
+    const missionTimer = this.add.text(W - 120, H - 14, '', {
+      fontSize: '11px', color: '#001a15', fontFamily: 'monospace',
+    }).setOrigin(0, 0.5).setDepth(202).setVisible(false);
+
+    this.registry.events.on('changedata-missionState', (_: unknown, state: string) => {
+      const active = state === 'active';
+      missionBg.setVisible(active);
+      missionText.setVisible(active);
+      missionTimer.setVisible(active);
+      if (state === 'passed') {
+        const text = this.registry.get('missionText') as string;
+        this.showBanner(text, 0x3DCC3D);
+      } else if (state === 'failed') {
+        this.showBanner('MISSION FAILED', 0xE03030);
+      }
     });
 
-    // Reference GameState to suppress unused import warning
+    this.registry.events.on('changedata-missionText', (_: unknown, text: string) => {
+      missionText.setText(text);
+    });
+
+    // Update mission timer each tick
+    this.time.addEvent({ delay: 250, loop: true, callback: () => {
+      const state = this.registry.get('missionState') as string | undefined;
+      if (state === 'active') {
+        const remaining = this.registry.get('missionRemaining') as number | undefined ?? 0;
+        const secs = Math.ceil(remaining / 1000);
+        missionTimer.setText(`${secs}s`);
+      }
+    }});
+
+    // --- Win overlay ---
+    this.registry.events.on('changedata-won', (_: unknown, won: boolean) => {
+      if (!won) return;
+      this.showWinScreen();
+    });
+
+    // --- Bust flash ---
+    this.registry.events.on('changedata-busted', () => {
+      this.showBanner('WASTED', 0xE03030, 2000);
+    });
+
+    // Mute key
+    this.input.keyboard!.on('keydown-M', () => { this.sound.mute = !this.sound.mute; });
     void GameState;
+  }
+
+  private showBanner(text: string, color: number, duration = 3000): void {
+    const W = this.scale.width;
+    const H = this.scale.height;
+    const banner = this.add.text(W / 2, H / 2, text, {
+      fontSize: '36px', color: `#${color.toString(16).padStart(6, '0')}`,
+      fontFamily: 'monospace', stroke: '#000000', strokeThickness: 4,
+    }).setOrigin(0.5, 0.5).setDepth(300);
+    this.time.delayedCall(duration, () => banner.destroy());
+  }
+
+  private showWinScreen(): void {
+    const W = this.scale.width;
+    const H = this.scale.height;
+    const score = this.registry.get('score') as number ?? 0;
+    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.85).setDepth(290).setOrigin(0.5);
+    this.add.text(W / 2, H / 2 - 60, 'LEVEL COMPLETE', {
+      fontSize: '40px', color: '#F5D800', fontFamily: 'monospace', stroke: '#000000', strokeThickness: 4,
+    }).setOrigin(0.5).setDepth(300);
+    this.add.text(W / 2, H / 2, `SCORE: $${score.toLocaleString()}`, {
+      fontSize: '22px', color: '#E8E4D4', fontFamily: 'monospace',
+    }).setOrigin(0.5).setDepth(300);
+    this.add.text(W / 2, H / 2 + 60, 'Refresh to play again', {
+      fontSize: '16px', color: '#888888', fontFamily: 'monospace',
+    }).setOrigin(0.5).setDepth(300);
   }
 }

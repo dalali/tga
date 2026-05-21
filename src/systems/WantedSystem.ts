@@ -6,6 +6,8 @@ export class WantedSystem {
   add(delta: number): void { this.stars = Math.min(4, this.stars + delta); this.cooldownMs = 0; }
   getStars(): number { return this.stars; }
   reset(): void { this.stars = 0; this.cooldownMs = 0; }
+  getCopCount(): number { return this.stars; }
+  isSwatActive(): boolean { return this.stars >= 4; }
 
   update(dt: number, copsSeePlayer: boolean): boolean {
     if (this.stars === 0) return false;

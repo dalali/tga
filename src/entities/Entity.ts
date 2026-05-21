@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export abstract class Entity extends Phaser.GameObjects.Sprite {
+export abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   protected hp: number;
   protected maxHp: number;
 
