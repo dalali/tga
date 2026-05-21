@@ -1,0 +1,31 @@
+[
+  {
+    "id": "mission-001",
+    "type": "deliver",
+    "title": "Hot Wheels",
+    "objective": "Steal the red sedan and deliver it to the garage",
+    "timerMs": 120000,
+    "reward": 5000,
+    "waypoint": { "x": 800, "y": 400, "label": "GARAGE" },
+    "vehicleId": "sedan-001"
+  },
+  {
+    "id": "mission-002",
+    "type": "kill",
+    "title": "The Hit",
+    "objective": "Eliminate the marked target",
+    "timerMs": 90000,
+    "reward": 8000,
+    "waypoint": { "x": 500, "y": 700, "label": "TARGET" },
+    "targetId": "npc-boss-001"
+  },
+  {
+    "id": "mission-003",
+    "type": "escape",
+    "title": "Getaway",
+    "objective": "Escape the police pursuit zone in time",
+    "timerMs": 60000,
+    "reward": 12000,
+    "waypoint": { "x": 200, "y": 200, "label": "ESCAPE" }
+  }
+]
