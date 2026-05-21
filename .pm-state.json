@@ -41,7 +41,8 @@
     "architecture": "docs/architecture.md"
   },
   "issues": [],
-  "status": "running",
+  "phase": "done",
+  "status": "complete",
   "notes": {
     "tech_stack_gate": "User requires explicit approval of tech stack BEFORE coding begins. Architecture phase must produce a clear recommendation; PM must stop after architecture for user review.",
     "analyst_pick": "Phaser 3 + TypeScript + Vite, Tiled for maps, Arcade Physics, vanilla Web Audio. CC0 art. Docker Compose for local v1."
