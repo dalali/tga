@@ -18,4 +18,5 @@ export abstract class Entity extends Phaser.GameObjects.Sprite {
   }
 
   isDead(): boolean { return this.hp <= 0; }
+  getHp(): number { return this.hp; }
 }
